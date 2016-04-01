@@ -1,0 +1,12 @@
+Manifest-Version: 1.0
+Implementation-Title: jjlive
+Implementation-Version: 1.1-SNAPSHOT
+Specification-Vendor: dwf.Alex
+Premain-Class: jjlive.Agent
+Agent-Class: jjlive.Agent
+Can-Redefine-Classes: true
+Specification-Title: scalive
+Implementation-Vendor-Id: tv.cntt
+Specification-Version: 1.0-SNAPSHOT
+Implementation-Vendor: dwf.Alex
+Main-Class: jjlive.AgentLoader
