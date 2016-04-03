@@ -3,10 +3,7 @@ package jjlive;
 import com.sun.tools.attach.VirtualMachine;
 import com.sun.tools.attach.VirtualMachineDescriptor;
 
-import java.io.Console;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
+import java.io.*;
 import java.lang.reflect.Method;
 import java.net.InetAddress;
 import java.net.ServerSocket;
@@ -111,8 +108,10 @@ public class Client {
         InputStream in = clientSock.getInputStream();
         OutputStream out = clientSock.getOutputStream();
         int length = command.length();
-        out.write(length);
-        out.write(command.getBytes());
+        DataInputStream dataIn = new DataInputStream(in);
+        DataOutputStream dataOut = new DataOutputStream(out);
+        dataOut.writeInt(command.getBytes().length);
+        dataOut.write(command.getBytes());
         out.flush();
         String ret = Data.read(in);
         System.out.println("ret:");

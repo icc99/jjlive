@@ -3,10 +3,10 @@ package jjlive;
 import jdk.nashorn.api.scripting.NashornScriptEngineFactory;
 
 import javax.script.ScriptEngine;
+import java.io.DataOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintStream;
-import java.lang.reflect.Method;
 import java.net.Socket;
 import java.net.URLClassLoader;
 
@@ -26,19 +26,23 @@ public class Server {
         System.setIn(in);
         System.setOut(new PrintStream(out));
         System.setErr(new PrintStream(out));
-
-        try {
-            String source = Data.read(in);
-            String ret = engine.eval(source)+"\n";
-            out.write(ret.getBytes());
-            out.flush();
-        } finally {
-            System.setIn(oldIn);
-            System.setOut(oldOut);
-            System.setErr(oldErr);
-            System.out.println("[Scalive] REPL closed");
-            client.close();
+        while (true) {
+            try {
+                String source = Data.read(in);
+                String ret = engine.eval(source)+"\n";
+                DataOutputStream dataOut = new DataOutputStream(out);
+                byte[] bytes = ret.getBytes("UTF-8");
+                dataOut.writeInt(bytes.length);
+                dataOut.write(bytes);
+                out.flush();
+            } finally {
+                System.setIn(oldIn);
+                System.setOut(oldOut);
+                System.setErr(oldErr);
+                System.out.println("[Scalive] REPL closed");
+            }
         }
+
     }
 
     private static void addJarsToURLClassLoader(URLClassLoader cl, String[] jarpaths) throws Exception {
