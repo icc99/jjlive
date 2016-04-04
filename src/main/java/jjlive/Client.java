@@ -95,7 +95,7 @@ public class Client {
                             break;
                         }
                         String ret = callServer(command);
-                        System.out.println(ret);
+                        System.out.print(ret);
                 }
 
             }
@@ -105,16 +105,16 @@ public class Client {
     }
 
     private String callServer(String command) throws Exception {
+        if (command == null || command.matches("\\s*")) {
+            return command;
+        }
         InputStream in = clientSock.getInputStream();
         OutputStream out = clientSock.getOutputStream();
-        int length = command.length();
-        DataInputStream dataIn = new DataInputStream(in);
         DataOutputStream dataOut = new DataOutputStream(out);
         dataOut.writeInt(command.getBytes().length);
         dataOut.write(command.getBytes());
         out.flush();
         String ret = Data.read(in);
-        System.out.println("ret:");
         return ret;
     }
 
