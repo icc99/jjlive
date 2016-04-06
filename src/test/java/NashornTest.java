@@ -15,6 +15,9 @@ import javax.script.ScriptEngineManager;
  * @since dwf 1.1
  */
 public class NashornTest {
+    public static int age = 10;
+    private static String name = "Alex";
+
     @Test
     public void testEval() throws Exception {
         NashornScriptEngineFactory factory = new NashornScriptEngineFactory();

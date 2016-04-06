@@ -30,7 +30,7 @@ public class Agent {
         final String jar = args[0];
         final int      port     = Integer.parseInt(args[1]);
 
-        System.out.println("[Scalive] REPL server starts at port " + port);
+        System.out.println("[jjlive] REPL server starts at port " + port);
         final ServerSocket server = new ServerSocket(port);
 
         // Need to start a new thread because:

@@ -16,9 +16,7 @@ public class Server {
         String ret = "";
         try {
             Object obj = engine.eval(source);
-            System.out.println(obj);
             if (obj == null) {
-                System.out.println("null~~~");
                 ret = "";
             } else {
                 ret = obj + "\n";

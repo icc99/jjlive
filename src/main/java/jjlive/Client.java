@@ -15,6 +15,7 @@ public class Client {
     private static Console cnsl = System.console();
     private int port;
     private Socket clientSock;
+    private VirtualMachine vm;
 
     private static InetAddress getLocalHostAddress() {
         try {
@@ -54,20 +55,32 @@ public class Client {
         String agentJar = "jjlive";
         agentJar = Classpath.findJar(new String[]{"."}, agentJar);
         System.out.println(agentJar);
-        final VirtualMachine vm = VirtualMachine.attach(pid+"");
+        this.vm = VirtualMachine.attach(pid+"");
         this.port = this.getFreePort();
-        vm.loadAgent(agentJar,  agentJar  + " " + port);
+        this.vm.loadAgent(agentJar,  agentJar  + " " + port);
         this.clientSock = new Socket("127.0.0.1", this.port);
+        Runtime.getRuntime().addShutdownHook(new Thread() {
+            public void run() {
+               if (Client.this.vm != null) {
+                   try {
+                       Client.this.vm.detach();
+                   } catch (IOException e) {
+                       e.printStackTrace();
+                   }
+               }
+            }
+        });
     }
 
     private void jjps() {
         listJvmProcesses();
     }
-    private void exit() {
+    private void exit() throws IOException {
+        this.vm.detach();
         System.exit(0);
     }
 
-    public void openREPL() throws SecurityException {
+    public void openREPL() throws SecurityException, IOException {
         try {
             System.out.println("jjlive started");
             String command = "";
@@ -101,6 +114,8 @@ public class Client {
             }
         } catch (Exception e) {
             e.printStackTrace();
+        } finally {
+            this.vm.detach();
         }
     }
 
@@ -118,45 +133,4 @@ public class Client {
         return ret;
     }
 
-    public static void connectToRepl(int port) throws Exception {
-        final Socket client = new Socket(LOCALHOST, port);
-        final InputStream in = client.getInputStream();
-        final OutputStream out = client.getOutputStream();
-
-        System.out.println("[Scalive] Attached to remote process at port " + port);
-
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                InputStreamReader reader = new InputStreamReader(in);
-                boolean closed = false;
-                while (!closed) {
-                    try {
-                        int i = reader.read();
-                        closed = i < 0;
-                        if (!closed) System.out.print((char) i);
-                    } catch (Exception e) {
-                        closed = true;
-                    }
-                }
-
-                System.out.println("[Scalive] Connection to remote process closed");
-                System.exit(0);
-            }
-        }).start();
-
-        boolean closed = false;
-        while (!closed) {
-            try {
-                String line = cnsl.readLine("jjlive>>");
-                out.write(line.getBytes());
-                out.write('\n');
-                out.flush();
-            } catch (Exception e) {
-                closed = true;
-            }
-        }
-
-        client.close();
-    }
 }
